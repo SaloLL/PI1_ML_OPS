@@ -1,5 +1,6 @@
 # Import libraries
 import pandas as pd
+import numpy as np
 
 
 def get_available_genres(df_steam_games):
@@ -34,26 +35,23 @@ def PlayTimeGenre(df_steam_games, user_items, genre):
         - df_steam_games: DataFrame containing game data.
         - user_items: DataFrame containing user profiles and game ownership data.
         - genre: Genre to filter games.
-
     Returns:
         - int: Year with the highest total play time for the specified genre. If the genre is not found, returns None.
     """
     try:
+        print(genre)
+        print(type(genre))
         # Check if the provided genre exists in the list of available genres
         available_genres = get_available_genres(df_steam_games)
+        print(available_genres)
         if genre not in available_genres:
-            print(f"The provided genre '{genre}' is not found in the list of available genres.")
-            return None
-
+            return f"The provided genre '{genre}' is not found in the list of available genres."
         # Step 1: Filter games by genre
         filtered_games = df_steam_games[df_steam_games['Genres'].str.contains(genre, case=False)]
-
         # Step 2: Bring 'Release_Year' from df_steam_games and add it to the filtered DataFrame
         filtered_games = filtered_games.merge(df_steam_games[['Id', 'Release_Year']], on='Id', how='left')
-
         # Step 3: Group the IDs of games by release year
         grouped_games = filtered_games.groupby('Release_Year_x')['Id'].apply(list).reset_index(name='Game_IDs')
-
         # Step 4: For each row in grouped_games, sum the play time for users with the game ID
         for index, row in grouped_games.iterrows():
             game_ids = row['Game_IDs']
@@ -63,7 +61,6 @@ def PlayTimeGenre(df_steam_games, user_items, genre):
         # Step 5: Find the year with the highest total play time
         year_with_max_playtime = grouped_games.loc[grouped_games['Total_Playtime'].idxmax(), 'Release_Year_x']
         return int(year_with_max_playtime)
-
     except KeyError:
         # If a KeyError occurs, return None
         return None
