@@ -2,65 +2,40 @@
 import pandas as pd
 import numpy as np
 
-
-def get_available_genres(df_steam_games):
-    """
-    Returns a list of all available genres in the DataFrame.
-    Parameters:
-        - df_steam_games: DataFrame containing game data.
-    Returns:
-        - list: List of all available genres.
-    """
-    # Step 1: Split the 'Genres' column by ',' to separate multiple genres in a single entry
-    genres_list = df_steam_games['Genres'].str.split(',')
-
-    # Step 2: Create an empty set to store unique genres
-    unique_genres = set()
-
-    # Step 3: Iterate through each entry in the genres_list and add genres to the set
-    for genres in genres_list:
-        unique_genres.update(genres)
-
-    # Step 4: Convert the set to a sorted list of unique genres
-    all_genres = sorted(list(unique_genres))
-
-    # Step 5: Return the list of all available genres
-    return all_genres
-
-def PlayTimeGenre(df_steam_games, user_items, genre):
+def max_playtime_year(hours_per_year, genre):
     """
     Returns the year with the highest total play time for games of the specified genre.
-
     Parameters:
-        - df_steam_games: DataFrame containing game data.
-        - user_items: DataFrame containing user profiles and game ownership data.
+        - hours_per_year: DataFrame containing total playtime per year and genre.
         - genre: Genre to filter games.
     Returns:
         - int: Year with the highest total play time for the specified genre. If the genre is not found, returns None.
     """
     try:
-        print(genre)
-        print(type(genre))
-        # Check if the provided genre exists in the list of available genres
-        available_genres = get_available_genres(df_steam_games)
-        print(available_genres)
-        if genre not in available_genres:
-            return f"The provided genre '{genre}' is not found in the list of available genres."
-        # Step 1: Filter games by genre
-        filtered_games = df_steam_games[df_steam_games['Genres'].str.contains(genre, case=False)]
-        # Step 2: Bring 'Release_Year' from df_steam_games and add it to the filtered DataFrame
-        filtered_games = filtered_games.merge(df_steam_games[['Id', 'Release_Year']], on='Id', how='left')
-        # Step 3: Group the IDs of games by release year
-        grouped_games = filtered_games.groupby('Release_Year_x')['Id'].apply(list).reset_index(name='Game_IDs')
-        # Step 4: For each row in grouped_games, sum the play time for users with the game ID
-        for index, row in grouped_games.iterrows():
-            game_ids = row['Game_IDs']
-            # total_play_time = user_items[user_items['Item_Id'].isin(game_ids.tolist())]['Playtime_Forever'].sum()
-            total_play_time = user_items[user_items['Item_Id'].isin(game_ids)]['Playtime_Forever'].sum()
-            grouped_games.at[index, 'Total_Playtime'] = total_play_time
-        # Step 5: Find the year with the highest total play time
-        year_with_max_playtime = grouped_games.loc[grouped_games['Total_Playtime'].idxmax(), 'Release_Year_x']
-        return int(year_with_max_playtime)
-    except KeyError:
+        genre = genre.lower()
+        # Initialize an empty list to store unique genres
+        unique_genres = []
+
+        # Loop through each entry in the 'Genres' column
+        for genres_entry in hours_per_year['Genres']:
+            # Split the entry by comma and strip any leading or trailing spaces
+            genres_list = [genre.strip() for genre in genres_entry.split(',')]
+    
+            # Add each genre from the entry to the list of unique genres
+            for genre in genres_list:
+                if genre not in unique_genres:
+                    unique_genres.append(genre)
+        # Now unique_genres contains a list of unique genres
+                    
+        print(unique_genres)
+        if genre not in unique_genres:
+            return f"Can't find the genre that you're looking for..."
+        # Filter the DataFrame by the specified genre
+        filtered_data = hours_per_year[hours_per_year['Genres'].str.contains(genre, case=False)]
+        # Find the year with the highest total play time
+        max_playtime_year = filtered_data.loc[filtered_data['Total_Playtime'].idxmax(), 'Release_Year']
+        return int(max_playtime_year)
+    except Exception as e:
         # If a KeyError occurs, return None
-        return None
+        print(e)
+        return e
