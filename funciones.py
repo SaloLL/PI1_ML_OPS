@@ -23,7 +23,8 @@ def max_playtime_year(hours_per_year, genre):
         if not genre_df.empty:
             # Find the year with the highest total playtime for the genre
             max_playtime_year = genre_df.loc[genre_df['Playtime_Forever'].idxmax(), 'Release_Year']
-            return int(max_playtime_year)
+            max_playtime_year = int(max_playtime_year)
+            return f"Release year with most playtime for {genre} : {max_playtime_year}"
         else:
             # Genre not found in the dataframe
             return f"Couldn't find the {genre} genre. Please check your input."

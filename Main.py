@@ -24,9 +24,9 @@ async def max_play_time_year(genre: str):
         - int: Year with the highest total play time for the specified genre. If the genre is not found, returns a message.
     """
     # Call the PlayTimeGenre function with the loaded DataFrames
-    max_year = max_playtime_year(hours_per_year, genre)
+    message = max_playtime_year(hours_per_year, genre)
 
-    return f"Release year with most playtime for {genre} : {max_year}"
+    return message
 
 @app.get("/user_for_genre/{genre}")
 async def  user_by_game_genre(genre: str):
