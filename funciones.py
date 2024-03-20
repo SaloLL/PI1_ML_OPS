@@ -1,6 +1,8 @@
 # Import libraries
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import NearestNeighbors
 
 
 def max_playtime_year(hours_per_year, genre):
@@ -68,3 +70,38 @@ def max_player_time_per_genre(hours_per_year, player_maxtime_genre, genre):
 
         # Raise the exception
         raise e
+    
+def recommend_games_for_user(df_reviews,User_Id):
+    # Transform the DataFrame into a matrix of users and games
+    user_item_matrix = pd.pivot_table(df_reviews, values='Sentiment_Score', index='User_Id', columns='App_Name', fill_value=0)
+    
+    # Split the data into training and test sets
+    train_data, test_data = train_test_split(user_item_matrix, test_size=0.2, random_state=42)
+    
+    # Train a nearest neighbors model (KNN)
+    model_knn = NearestNeighbors(metric='cosine', algorithm='brute')
+    model_knn.fit(train_data.values)
+    
+    # Try to find the index of the user
+    try:
+        user_index = train_data.index.get_loc(User_Id)
+    except KeyError:
+        return "User name not found."
+    
+    # Find the nearest neighbors to the selected user
+    distances, indices = model_knn.kneighbors(train_data.iloc[user_index, :].values.reshape(1, -1), n_neighbors=6)
+    
+    # Make recommendations based on the nearest neighbors (excluding the first neighbor, which is the user itself)
+    recommended_games = set()  # Set to keep track of recommended games
+    for i in range(1, len(distances.flatten())):
+        similar_user_index = indices.flatten()[i]
+        similar_user_id = train_data.index[similar_user_index]  # Get the User_Id of the similar user
+        similar_user_games = df_reviews[df_reviews['User_Id'] == similar_user_id]['App_Name']  # Get the games of the similar user
+        for game in similar_user_games:
+            if len(recommended_games) < 5 and game not in recommended_games:  # Check if more games are needed and if the game has not been recommended before
+                recommended_games.add(game)  # Add the game to the set of recommended games
+        if len(recommended_games) >= 5:  # Exit the loop if 5 games have already been recommended
+            break
+    message = f"Recomendations for {User_Id}: {recommended_games}"
+    return message
+        

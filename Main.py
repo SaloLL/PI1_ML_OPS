@@ -2,12 +2,14 @@ from fastapi import FastAPI
 import pandas as pd
 from funciones import max_playtime_year
 from funciones import max_player_time_per_genre
+from funciones import recommend_games_for_user
 
 app = FastAPI()
 
 # Load the DataFrames when the application starts
 player_maxtime_genre = pd.read_parquet('GZIP/max_playtime_user_genre.gzip')
 hours_per_year = pd.read_parquet('GZIP/max_hours_per_year.gzip')
+df_reviews = pd.read_parquet('ML_data/ML_function/df_ML.gzip')
 
 
 @app.get("/")
@@ -40,3 +42,15 @@ async def  user_by_game_genre(genre: str):
     user_max_time = max_player_time_per_genre(hours_per_year, player_maxtime_genre, genre)
     
     return user_max_time
+
+@app.get("/get_recommendations/{user}")
+async def get_recommendations(user: str):
+    """
+    Returns recommended games for the specified user.
+    Parameters:
+        - user: User for whom recommendations are requested.
+    Returns:
+        - List[str]: List of recommended games. If the user is not found, returns a message.
+    """
+    recommendations = recommend_games_for_user(df_reviews, user)
+    return recommendations
