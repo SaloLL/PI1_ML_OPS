@@ -6,7 +6,7 @@ Este proyecto se enfocó en el proceso para crear un MVP (Minimum Viable Product
 
 Enlaces del proyecto:
 - Repositorio en GitHub: [SaloLL/PI1_ML_OPS](https://github.com/SaloLL/PI1_ML_OPS/blob/main/README.md)
-- Video explicativo: [https://drive.google.com/file/d/1PO4YrjbhXscO8om6JrBkhyhncGX1G2z3/view?usp=sharing](https://drive.google.com/file/d/1PO4YrjbhXscO8om6JrBkhyhncGX1G2z3/view?usp=sharing)
+- Video explicativo: [Video DEMO](https://drive.google.com/file/d/1dqeAzvLWxw8dyaWpSRVWB6iqCQq9MaNY/view?usp=sharing)
 - Despliegue: [Deploy en Render](https://pi1-ml-ops.onrender.com/docs)
 
 
@@ -32,6 +32,7 @@ En el archivo ML_RECOMENDATION.ipynb se tomaron los datos limpios que preparamos
 
 ---
 DOCUMENTOS: 
+(Se recomienda descargar los .ipynb, en especial ETL_SOJ_NBK.ipynb ya que es extenso)
 1. [ETL's y DataFrames del proyecto](ETL_SOJ_NBK.ipynb)
 2. [EDA y DataFrames para ML](EDA_ML.ipynb)
 3. [Limpieza de Datos para la función de ML](ML_RECOMENDATION.ipynb)
